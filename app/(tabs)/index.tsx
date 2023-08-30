@@ -1,14 +1,24 @@
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
+import { useEffect, useState } from 'react';
+import CovidAPI, { GlobalStatsResponseType } from '../../constants/CovidAPI';
 
 export default function TabOneScreen() {
+  const [stats, setStats] = useState<GlobalStatsResponseType>();
+
+  useEffect(() => {
+    CovidAPI.getGlobalStats().then((res) => setStats(res));
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Text style={styles.title}>{JSON.stringify(stats)}</Text>
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
     </View>
   );
 }

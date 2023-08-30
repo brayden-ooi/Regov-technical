@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 // import { useAuth } from "../context/auth";
 import { Stack, useRouter } from 'expo-router';
@@ -28,7 +29,7 @@ export default function SignUp() {
       router.replace('/');
     } else {
       console.log(error);
-      // Alert.alert("Login Error", resp.error?.message);
+      Alert.alert('Sign up Error', error?.message);
     }
   };
 

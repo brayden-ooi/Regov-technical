@@ -4,29 +4,27 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-// import { useAuth } from "../context/auth";
+import { useAuth } from '../../context/auth';
 import { Stack, useRouter } from 'expo-router';
 import { useRef } from 'react';
 
 export default function SignIn() {
-  // const { signIn } = useAuth();
+  const { signIn } = useAuth();
   const router = useRouter();
 
   const emailRef = useRef('');
   const passwordRef = useRef('');
 
   const onPressSignIn = async () => {
-    // const { data, error } = await signIn(
-    //   emailRef.current,
-    //   passwordRef.current
-    // );
-    // if (data) {
-    //   router.replace("/");
-    // } else {
-    //   console.log(error);
-    //   // Alert.alert("Login Error", resp.error?.message);
-    // }
+    const { data, error } = await signIn(emailRef.current, passwordRef.current);
+    if (data) {
+      router.replace('/');
+    } else {
+      console.log(error);
+      Alert.alert('Login Error', error?.message);
+    }
   };
 
   const onPressSignUp = () => router.push('/sign-up');

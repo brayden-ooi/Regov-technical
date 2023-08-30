@@ -1,11 +1,21 @@
 import { useRootNavigation, useRouter, useSegments } from 'expo-router';
-import React, { PropsWithChildren } from 'react';
+import React, {
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { useMMKVObject } from 'react-native-mmkv';
 
-type User = {};
+type User = {
+  username: string;
+  email: string;
+  password: string;
+};
 
 // Define the AuthContextValue interface
 interface SignInResponse {
-  data: User | null;
+  data: Omit<User, 'username'> | null;
   error: Error | null;
 }
 
@@ -18,7 +28,7 @@ interface AuthContextValue {
   signIn: (e: string, p: string) => Promise<SignInResponse>;
   signUp: (e: string, p: string, n: string) => Promise<SignInResponse>;
   signOut: () => Promise<SignOutResponse>;
-  user: User | null;
+  user: User | undefined;
 }
 
 // Create the AuthContext
@@ -26,7 +36,7 @@ const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 // This hook can be used to access the user info.
 export const useAuth = () => {
-  const authContext = React.useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   if (!authContext) {
     throw new Error('useAuth must be used within an AuthContextProvider');
@@ -36,7 +46,7 @@ export const useAuth = () => {
 };
 
 // This hook will protect the route access based on user authentication.
-function useProtectedRoute(user: User | null) {
+function useProtectedRoute(session: boolean) {
   const segments = useSegments();
   const router = useRouter();
 
@@ -44,7 +54,7 @@ function useProtectedRoute(user: User | null) {
   const [isNavigationReady, setNavigationReady] = React.useState(false);
   const rootNavigation = useRootNavigation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = rootNavigation?.addListener('state', (event) => {
       setNavigationReady(true);
     });
@@ -55,7 +65,7 @@ function useProtectedRoute(user: User | null) {
     };
   }, [rootNavigation]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isNavigationReady) {
       return;
     }
@@ -64,35 +74,53 @@ function useProtectedRoute(user: User | null) {
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
-      !user &&
+      !session &&
       !inAuthGroup
     ) {
       // Redirect to the sign-in page.
       router.replace('/sign-in');
-    } else if (user && inAuthGroup) {
+    } else if (session && inAuthGroup) {
       // Redirect away from the sign-in page.
       router.replace('/');
     }
-  }, [user, segments, isNavigationReady]);
+  }, [session, segments, isNavigationReady]);
 }
 
 export function Provider(props: PropsWithChildren) {
-  const [user, setAuth] = React.useState<User | null>(null);
+  const [auth, setAuth] = useMMKVObject<User>('user');
+  const [session, setSession] = useState<boolean>(false);
 
-  useProtectedRoute(user);
+  useProtectedRoute(session);
 
   const signIn = async (
     email: string,
     password: string,
   ): Promise<SignInResponse> => {
     try {
-      const response = await Promise.resolve({});
+      // not allowed to sign in if in session
+      if (session) {
+        return { data: null, error: new Error('Not allowed to sign in') };
+      }
 
-      const user = await Promise.resolve({});
-      setAuth(user);
+      // if no account to match sign in will never work
+      if (!auth) {
+        return { data: null, error: new Error('No user registered') };
+      }
+
+      const user = {
+        email,
+        password,
+      };
+
+      if (auth.email !== email || auth.password !== password) {
+        return { data: null, error: new Error('Wrong credentials') };
+      }
+
+      setSession(true);
+
       return { data: user, error: null };
     } catch (error) {
-      setAuth(null);
+      setSession(false);
       return { error: error as Error, data: null };
     }
   };
@@ -103,37 +131,39 @@ export function Provider(props: PropsWithChildren) {
     username: string,
   ): Promise<SignInResponse> => {
     try {
-      console.log(email, password, username);
+      // not allowed to sign up if in session
+      if (session) {
+        return { data: null, error: new Error('Not allowed to sign up') };
+      }
 
-      // // create the user
-      // await appwrite.account.create(
-      //   appwrite.ID.unique(),
-      //   email,
-      //   password,
-      //   username
-      // );
+      // Only allow one registration for demonstration
+      if (auth) {
+        return { data: null, error: new Error('Not allowed to sign up') };
+      }
 
-      // // create the session by logging in
-      // await appwrite.account.createEmailSession(email, password);
-
-      // get Account information for the user
-      const user = await Promise.resolve({});
+      // TODO Install ZOD
+      const user = {
+        email,
+        password,
+        username,
+      };
       setAuth(user);
+      setSession(true);
+
       return { data: user, error: null };
     } catch (error) {
-      setAuth(null);
+      setSession(false);
       return { error: error as Error, data: null };
     }
   };
 
   const signOut = async (): Promise<SignOutResponse> => {
     try {
-      const response = await Promise.resolve({});
-      return { error: undefined, data: response };
+      return { error: undefined, data: {} };
     } catch (error) {
       return { error, data: null };
     } finally {
-      setAuth(null);
+      setSession(false);
     }
   };
 
@@ -143,7 +173,7 @@ export function Provider(props: PropsWithChildren) {
         signIn,
         signUp,
         signOut,
-        user,
+        user: auth,
       }}
     >
       {props.children}

@@ -40,6 +40,19 @@ export type CountryStatsResponseType = {
   testsPerOneMillion: number;
 };
 
+export type GetAllCountryStatsRequestParams = {
+  sortBy?:
+    | 'cases'
+    | 'todayCases'
+    | 'deaths'
+    | 'todayDeaths'
+    | 'recovered'
+    | 'active'
+    | 'critical'
+    | 'casesPerOneMillion'
+    | 'deathsPerOneMillion';
+};
+
 class CovidAPI {
   // used for search groups
   static countriesByContinent = Countries;
@@ -66,6 +79,24 @@ class CovidAPI {
       );
 
       return (await res.json()) as CountryStatsResponseType;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static async getAllCountryStats(
+    config?: GetAllCountryStatsRequestParams,
+  ): Promise<Array<CountryStatsResponseType> | null> {
+    try {
+      const params = new URLSearchParams({
+        ...(config?.sortBy && { sort: config.sortBy }),
+      }).toString();
+
+      const res = await fetch(
+        `https://corona.lmao.ninja/v2/countries?${params}`,
+      );
+
+      return (await res.json()) as Array<CountryStatsResponseType>;
     } catch (e) {
       return null;
     }

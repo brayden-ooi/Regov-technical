@@ -14,3 +14,11 @@ export const useGetCountryStats = (country: string) =>
     queryKey: ['GET_COUNTRY_STATS', country],
     queryFn: () => CovidAPI.getCountryStats(country),
   });
+
+export const useGetAllCountryStats = (
+  config?: GetAllCountryStatsRequestParams,
+) =>
+  useQuery({
+    queryKey: ['GET_ALL_COUNTRY_STATS', config?.sortBy],
+    queryFn: () => CovidAPI.getAllCountryStats(config),
+  });

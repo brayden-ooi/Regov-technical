@@ -1,4 +1,4 @@
-import { Animated, StatusBar, StyleSheet } from 'react-native';
+import { Animated, StatusBar, StyleSheet, Text } from 'react-native';
 
 import { View } from '../../components/Themed';
 import { useState } from 'react';
@@ -11,16 +11,43 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useGetAllCountryStats } from '../../queries/CovidAPI';
 
-const FirstRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#ff4081' }]} />
-);
-const SecondRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
-);
+const FirstRoute = () => {
+  const { status, data, error } = useGetAllCountryStats({
+    sortBy: 'todayCases',
+    yesterday: true,
+  });
 
-const ThirdRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
-);
+  return (
+    <View style={[styles.container, { backgroundColor: '#ff4081' }]}>
+      <Text>{JSON.stringify(data)}</Text>
+    </View>
+  );
+};
+
+const SecondRoute = () => {
+  const { status, data, error } = useGetAllCountryStats({
+    sortBy: 'todayDeaths',
+    yesterday: true,
+  });
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#673ab7' }]}>
+      <Text>{JSON.stringify(data)}</Text>
+    </View>
+  );
+};
+
+const ThirdRoute = () => {
+  const { status, data, error } = useGetAllCountryStats({
+    sortBy: 'cases',
+  });
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#673ac7' }]}>
+      <Text>{JSON.stringify(data)}</Text>
+    </View>
+  );
+};
 
 export default function RankingsScreen() {
   const [tabState, setTabState] = useState({
@@ -33,8 +60,6 @@ export default function RankingsScreen() {
   });
   const setTabIndex = (index: number) =>
     setTabState((prevState) => ({ ...prevState, index }));
-
-  const { status, data, error } = useGetAllCountryStats();
 
   const renderTabBar = (
     props: SceneRendererProps & {

@@ -51,6 +51,7 @@ export type GetAllCountryStatsRequestParams = {
     | 'critical'
     | 'casesPerOneMillion'
     | 'deathsPerOneMillion';
+  yesterday?: boolean;
 };
 
 class CovidAPI {
@@ -88,12 +89,22 @@ class CovidAPI {
     config?: GetAllCountryStatsRequestParams,
   ): Promise<Array<CountryStatsResponseType> | null> {
     try {
-      const params = new URLSearchParams({
-        ...(config?.sortBy && { sort: config.sortBy }),
-      }).toString();
+      const params: Record<string, string> = {};
+
+      if (config) {
+        if (config.sortBy) {
+          params.sort = config.sortBy;
+        }
+
+        if (config.yesterday) {
+          params.yesterday = config.yesterday ? 'true' : 'false';
+        }
+      }
 
       const res = await fetch(
-        `https://corona.lmao.ninja/v2/countries?${params}`,
+        `https://corona.lmao.ninja/v2/countries?${new URLSearchParams(
+          params,
+        ).toString()}`,
       );
 
       return (await res.json()) as Array<CountryStatsResponseType>;

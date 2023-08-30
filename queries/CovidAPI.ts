@@ -19,6 +19,6 @@ export const useGetAllCountryStats = (
   config?: GetAllCountryStatsRequestParams,
 ) =>
   useQuery({
-    queryKey: ['GET_ALL_COUNTRY_STATS', config?.sortBy],
+    queryKey: ['GET_ALL_COUNTRY_STATS', config?.yesterday, config?.sortBy],
     queryFn: () => CovidAPI.getAllCountryStats(config),
   });

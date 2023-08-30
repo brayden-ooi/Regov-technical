@@ -52,9 +52,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="rankings"
+        name="countries"
         options={{
-          title: 'Rankings',
+          title: 'Countries',
           tabBarIcon: ({ color }) => <TabBarIcon name="flag" color={color} />,
         }}
       />

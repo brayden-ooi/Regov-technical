@@ -33,6 +33,7 @@ const TabSearchScreenHeader = ({
       value={searchStr}
       style={styles.textInput}
     />
+    {/* TODO */}
     <Button onPress={() => setSearchStr('')} title="History" />
   </View>
 );

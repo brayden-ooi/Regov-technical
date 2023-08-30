@@ -8,7 +8,10 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import { Provider, useAuth } from '../context/auth';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider } from '../context/auth';
+
+const queryClient = new QueryClient();
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,7 +49,9 @@ export default function RootLayout() {
 
   return (
     <Provider>
-      <RootLayoutNav />
+      <QueryClientProvider client={queryClient}>
+        <RootLayoutNav />
+      </QueryClientProvider>
     </Provider>
   );
 }

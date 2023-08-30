@@ -1,19 +1,32 @@
 import { StyleSheet } from 'react-native';
 
 import { Text, View } from '../../components/Themed';
-import { useEffect, useState } from 'react';
-import CovidAPI, { GlobalStatsResponseType } from '../../constants/CovidAPI';
+import { useGetGlobalStats } from '../../queries/CovidAPI';
 
 export default function TabOneScreen() {
-  const [stats, setStats] = useState<GlobalStatsResponseType>();
+  const { status, data, error } = useGetGlobalStats();
 
-  useEffect(() => {
-    CovidAPI.getGlobalStats().then((res) => setStats(res));
-  }, []);
+  if (error) {
+    console.log(error);
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{JSON.stringify(stats)}</Text>
+      {(() => {
+        switch (status) {
+          case 'success': {
+            return <Text style={styles.title}>{JSON.stringify(data)}</Text>;
+          }
+          case 'error': {
+            return (
+              <Text style={styles.title}>The page could not be fetched!</Text>
+            );
+          }
+          case 'loading': {
+            return <Text style={styles.title}>Loading...</Text>;
+          }
+        }
+      })()}
       <View
         style={styles.separator}
         lightColor="#eee"

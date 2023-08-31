@@ -16,7 +16,6 @@ import Colors from '../../constants/Colors';
 import { nonNullable } from '../../utils';
 
 const width = Dimensions.get('window').width; //full width
-const height = Dimensions.get('window').height; //full height
 
 const TabSearchScreenHeader = ({
   searchStr,
@@ -34,7 +33,7 @@ const TabSearchScreenHeader = ({
       style={styles.textInput}
     />
     {/* TODO */}
-    <Button onPress={() => setSearchStr('')} title="History" />
+    <Button onPress={() => setSearchStr('')} disabled title="History" />
   </View>
 );
 
@@ -80,15 +79,16 @@ export default function TabSearchScreen() {
             <Link href={`/country/${item}`} asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: Colors[colorScheme ?? 'light'].text,
-                      opacity: pressed ? 0.5 : 1,
-                    }}
-                  >
-                    {item}
-                  </Text>
+                  <View>
+                    <Text
+                      style={{
+                        color: Colors[colorScheme ?? 'light'].text,
+                        opacity: pressed ? 0.5 : 1,
+                      }}
+                    >
+                      {item}
+                    </Text>
+                  </View>
                 )}
               </Pressable>
             </Link>
@@ -125,13 +125,16 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
   },
 
-  countryContainer: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-  },
   continent: {
-    fontSize: 32,
+    fontWeight: '200',
+    padding: 10,
+    paddingTop: 20,
+    paddingLeft: 20,
     backgroundColor: '#fff',
+  },
+
+  countryContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 });

@@ -5,10 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { useAuth } from '../../context/auth';
 import { Stack, useRouter } from 'expo-router';
 import { useRef } from 'react';
+import { tintColorLight } from '../../constants/Colors';
+
+const width = Dimensions.get('window').width; //full width
 
 export default function SignIn() {
   const { signIn } = useAuth();
@@ -32,7 +36,7 @@ export default function SignIn() {
   return (
     <>
       <Stack.Screen options={{ title: 'sign up', headerShown: false }} />
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.formContainer}>
         <View>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -61,7 +65,7 @@ export default function SignIn() {
         <TouchableOpacity onPress={onPressSignIn} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 10 }}>
           <Text style={{ fontWeight: '200' }} onPress={onPressSignUp}>
             Click Here To Create A New Account
           </Text>
@@ -72,23 +76,29 @@ export default function SignIn() {
 }
 
 const styles = StyleSheet.create({
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   label: {
     marginBottom: 4,
-    color: '#455fff',
+    fontWeight: '500',
   },
   textInput: {
-    width: 250,
+    width: width - 40,
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: '#455fff',
+    borderColor: tintColorLight,
     paddingHorizontal: 8,
     paddingVertical: 4,
     marginBottom: 16,
+    height: 40,
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: tintColorLight,
     padding: 10,
-    width: 250,
+    width: width - 40,
     borderRadius: 5,
     marginTop: 16,
   },

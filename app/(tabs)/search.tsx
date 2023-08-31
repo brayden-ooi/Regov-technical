@@ -16,6 +16,7 @@ import Colors from '../../constants/Colors';
 import { nonNullable } from '../../utils';
 
 const width = Dimensions.get('window').width; //full width
+const height = Dimensions.get('window').height; //full width
 
 const TabSearchScreenHeader = ({
   searchStr,
@@ -97,7 +98,11 @@ export default function TabSearchScreen() {
         renderSectionHeader={({ section: { title, data } }) =>
           data.length ? <Text style={styles.continent}>{title}</Text> : null
         }
-        ListEmptyComponent={() => <Text>No country found!</Text>}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.empty}>No countries found!</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -136,5 +141,17 @@ const styles = StyleSheet.create({
   countryContainer: {
     paddingHorizontal: 20,
     paddingVertical: 10,
+  },
+
+  emptyContainer: {
+    height: height - 120,
+    width: width,
+    flex: 1,
+    justifyContent: 'center',
+    margin: 'auto',
+  },
+  empty: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

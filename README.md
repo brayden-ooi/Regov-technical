@@ -22,3 +22,4 @@ Given the time constraints, the following items could not be completed in time, 
 1. React Query Caching with MMKV - It will persist the cache so user will not need to refetch on launch
 2. Search history - It is currently disabled, onPress it will display a list of the past countries you have viewed
 3. Manual reload gesture
+4. Reset account flow - The sign in screen and the settings will have the option to drop the registered account

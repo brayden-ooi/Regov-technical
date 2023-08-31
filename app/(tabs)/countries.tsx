@@ -5,7 +5,11 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  Pressable,
+  useColorScheme,
+  Dimensions,
 } from 'react-native';
+import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { View } from '../../components/Themed';
 import { useEffect, useState } from 'react';
@@ -19,7 +23,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useGetAllCountryStats } from '../../queries/CovidAPI';
 import { CountryStatsResponseType } from '../../constants/CovidAPI';
 import { statFormatter } from '../../utils';
-import { tintColorLight } from '../../constants/Colors';
+import Colors, { tintColorLight } from '../../constants/Colors';
 
 const Card = ({
   payload,
@@ -29,22 +33,39 @@ const Card = ({
   payload: CountryStatsResponseType;
   selector: keyof CountryStatsResponseType;
   index: number;
-}) => (
-  <View style={styles.cardContainer}>
-    <View style={styles.rankContainer}>
-      <Text style={styles.rank}>{index + 1}</Text>
-    </View>
-    <View style={styles.countryInfoContainer}>
-      <Text>{payload.country}</Text>
-      <Text style={styles.timestamp}>
-        {formatRelative(new Date(payload.updated), new Date())}
-      </Text>
-    </View>
-    <View style={styles.metricContainer}>
-      <Text>{statFormatter(Number(payload[selector]))}</Text>
-    </View>
-  </View>
-);
+}) => {
+  const colorScheme = useColorScheme();
+
+  return (
+    <Link href={`/country/${payload.country}`} asChild>
+      <Pressable>
+        {({ pressed }) => (
+          <View style={styles.cardContainer}>
+            <View style={styles.rankContainer}>
+              <Text style={styles.rank}>{index + 1}</Text>
+            </View>
+            <View style={styles.countryInfoContainer}>
+              <Text
+                style={{
+                  color: Colors[colorScheme ?? 'light'].text,
+                  opacity: pressed ? 0.5 : 1,
+                }}
+              >
+                {payload.country}
+              </Text>
+              <Text style={styles.timestamp}>
+                {formatRelative(new Date(payload.updated), new Date())}
+              </Text>
+            </View>
+            <View style={styles.metricContainer}>
+              <Text>{statFormatter(Number(payload[selector]))}</Text>
+            </View>
+          </View>
+        )}
+      </Pressable>
+    </Link>
+  );
+};
 
 const FirstRoute = () => {
   const { status, data, error, refetch } = useGetAllCountryStats({
